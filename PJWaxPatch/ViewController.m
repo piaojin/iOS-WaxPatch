@@ -60,15 +60,19 @@
  *
  */
 - (IBAction)updateViewControllerClick:(id)sender {
-    [self updateLocalWaxPatch];
-//    [self updateServerWaxPatch];
+    //本地测试
+//    [self updateLocalWaxPatch];
+    //网络测试
+    [self updateServerWaxPatch];
     [self initView];
 }
 
 //修改任意类（这边修改一个UIView类和NSObject类）
 - (IBAction)updateClasses:(id)sender {
-    [self updateLocalWaxPatch];
-//    [self updateServerWaxPatch];
+    //本地测试
+//    [self updateLocalWaxPatch];
+    //网络测试
+    [self updateServerWaxPatch];
     [self updateCustomeView];
 }
 
@@ -106,7 +110,9 @@
 -(void)updateServerWaxPatch{
     //patch.zip在服务器的地址（这边是在我的github上）
     NSURL *patchUrl = [NSURL URLWithString:WAX_PATCH_URL];
-    NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:patchUrl] returningResponse:NULL error:NULL];
+    NSHTTPURLResponse* response;
+    NSError* error;
+    NSData *data = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:patchUrl] returningResponse:&response error:&error];
     if(data) {
         NSString *doc = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
         
@@ -117,6 +123,8 @@
         [data writeToFile:patchZip atomically:YES];
         
         [self wax_Patch:patchZip];
+    }else{
+        [[[UIAlertView alloc] initWithTitle:nil message:[NSString stringWithFormat:@"下载patch.zip失败 %@,错误码:%ld ,error信息:%@", patchUrl,(long)response.statusCode,error] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
     }
 }
 
